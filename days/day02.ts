@@ -30,21 +30,10 @@ function isFakeMulti(n: number) {
 async function baseFunction(wrappedFn: (n: number) => boolean) {
     // inputs are inclusive ranges in "123-456" format
     const inputs = (await readFile("../inputs/02.txt")).split(',').map((x: string): Range => x.split('-', 2).map(Number) as Range);
-    const cacheMap: {
-        [key: number]: boolean | undefined
-    } = {};
     const invalidSum = inputs.reduce((a: number, x: Range) => {
         let amountToAdd = 0;
         for (let i=x[0]; i<=x[1]; i++) {
-            switch (cacheMap[i]) {
-                case (undefined):
-                    const result = wrappedFn(i);
-                    cacheMap[i] = result;
-                    if (result) amountToAdd += i;
-                    continue;
-                case (true):
-                    amountToAdd += i;
-            }
+            if (wrappedFn(i)) amountToAdd += i;
         }
         return a + amountToAdd;
     }, 0)
