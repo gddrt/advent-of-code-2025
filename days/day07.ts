@@ -1,7 +1,12 @@
 import { readLines } from "../utils/file";
 
+async function getLines() {
+    // minor optimization -- we can ignore the spacer lines
+    return (await readLines("../inputs/07.txt")).filter(x => x.match(/[^\.]/));
+}
+
 export async function partOne() {
-    const lines = await readLines("../inputs/07.txt");
+    const lines = await getLines();
     // Find the first splitter
     const results = lines.reduce(({beams, splits}, line) => {
         let newBeams = new Set<number>();
@@ -32,7 +37,7 @@ export async function partTwo() {
     // merging timeline counts on each splitter,
     // and then take only the column that comes out of the start.
 
-    const lines = await readLines("../inputs/07.txt");
+    const lines = await getLines();
 
     const beams = Array(lines[0]!.length).fill(1);
 
