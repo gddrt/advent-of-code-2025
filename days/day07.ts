@@ -1,6 +1,6 @@
 import { readLines } from "../utils/file";
 
-async function partOne() {
+export async function partOne() {
     const lines = await readLines("../inputs/07.txt");
     // Find the first splitter
     const results = lines.reduce(({beams, splits}, line) => {
@@ -26,7 +26,7 @@ async function partOne() {
     return results.splits;
 }
 
-async function partTwo() {
+export async function partTwo() {
     // It's easier to work backwards.
     // So what we do is count every column backwards,
     // merging timeline counts on each splitter,
