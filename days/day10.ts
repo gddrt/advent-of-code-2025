@@ -48,24 +48,21 @@ async function parseInput(fileName: string) {
 }
 
 async function partOne() {
-    // idea: use memoization.
-    // on starting state, run each switch and save the output to a map
-
     const lines = await parseInput('../inputs/10.txt');
 
     const fewestSum = lines.reduce((a, { lights, switches }) => {
-        const switchMap: {
-            [key: number]: number
-        } = {}
-        switchMap[0] = 0;
-
-        // maybe i don't need memoization. maybe I just need to keep track
-        // of combos I've seen, because necessarily, duplicating a combo
-        // is inefficient
-
+        // Track all the switch results we've already seen (starting
+        // with 0, eg. all off.)
         const seen = new Set<number>([0]);
+
+        // Track the results we are currently calculating
         let activeCombos = new Set<number>([0]);
 
+        // For each "active" switch result, calculate all permutations
+        // (eg. what happens if we press every switch)
+        // If we encounter a duplicate result, we can stop calculating
+        // because we know there is a more efficient way to arrive there.
+        // Keep iterating until we find an answer.
         let iterCount = 0;
         while (iterCount < 100000) {
             iterCount++;
@@ -73,7 +70,8 @@ async function partOne() {
 
             for (const combo of activeCombos) {
                 for (const single of switches) {
-                    const result = combo ^ single;
+                    const result = combo ^ single; // bitwise XOR
+
                     // We found a combo that turns everything on
                     // Success!
                     if (result === lights) return a + iterCount;
@@ -102,3 +100,5 @@ async function partOne() {
 
     return fewestSum;
 }
+
+// Part two can be done using the same strategy. It's just not bitwise.
