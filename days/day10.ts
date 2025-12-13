@@ -47,7 +47,7 @@ async function parseInput(fileName: string) {
         })
 }
 
-async function partOne() {
+export async function partOne() {
     const lines = await parseInput('../inputs/10.txt');
 
     const fewestSum = lines.reduce((a, { lights, switches }) => {
@@ -101,4 +101,45 @@ async function partOne() {
     return fewestSum;
 }
 
-// Part two can be done using the same strategy. It's just not bitwise.
+async function parseInputTwo(fileName: string) {
+    const lines = await readLines(fileName);
+    return lines
+        .map((line) => {
+            // Sorry for the indecipherable regex.
+            // A sample line is
+            // [.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}
+            // Separate that into the three parts.
+            // (note: this regex is not _entirely_ accurate -- it doesn't
+            //  validate the syntax perfectly, but we can trust the input)
+            const matches = line
+                .match(/^\[([\.#]+)\]\s([\(\)\d,\s]+)\s\{([\d,]+)\}$/)
+
+            // There are 3 groups; matches[0] is the entire line.
+            if (matches?.length !== 4) throw Error("Bad input!");
+            
+            // Part two doesn't work with bitwise.
+
+            // The switches.
+            const switches = matches[2]?.split(' ').map((x) => {
+                // x = one switch group, eg. "(1,2)"
+                return x.substring(1, x.length-1) // trim parentheses
+                    .split(',')
+                    .map(Number)
+            });
+
+            // The joltages
+            const joltages = matches[3]?.substring(1, matches[3].length - 1)
+                .split(',').map(Number)
+
+            // Type-narrowing (and error-checking)
+            if (switches === undefined || joltages === undefined) throw Error("You didn't read your input well.");
+
+            return { switches, joltages }
+        })
+}
+
+export async function partTwo() {
+    const lines = await parseInputTwo('../inputs/10sample.txt');
+
+    throw Error("Not implemented.");
+}
