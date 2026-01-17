@@ -1,4 +1,8 @@
 import { readLines } from "../utils/file";
+import solver from "javascript-lp-solver";
+import type { Model, Solution } from "javascript-lp-solver";
+
+type PartTwoInput = {switches: number[][], joltages: number[]}
 
 async function parseInput(fileName: string) {
     const lines = await readLines(fileName);
@@ -101,7 +105,7 @@ export async function partOne() {
     return fewestSum;
 }
 
-async function parseInputTwo(fileName: string) {
+async function parseInputTwo(fileName: string): Promise<PartTwoInput[]> {
     const lines = await readLines(fileName);
     return lines
         .map((line) => {
@@ -128,8 +132,7 @@ async function parseInputTwo(fileName: string) {
             });
 
             // The joltages
-            const joltages = matches[3]?.substring(1, matches[3].length - 1)
-                .split(',').map(Number)
+            const joltages = matches[3]?.split(',').map(Number)
 
             // Type-narrowing (and error-checking)
             if (switches === undefined || joltages === undefined) throw Error("You didn't read your input well.");
@@ -138,8 +141,41 @@ async function parseInputTwo(fileName: string) {
         })
 }
 
-export async function partTwo() {
-    const lines = await parseInputTwo('../inputs/10sample.txt');
+function solveLPProblem( line: PartTwoInput ) {
+    // Construct a model instance with the correct parameters
 
-    throw Error("Not implemented.");
+    const { switches, joltages } = line; 
+    const constraints = Object.fromEntries(joltages.map((x, i) => {
+        return [i.toString(), { equal: x }]
+    }))
+    const variables = Object.fromEntries(switches.map((x, i) => {
+        return [
+            i.toString(),
+            {
+                count: 1,
+                ...Object.fromEntries(x.map(y => [y.toString(), 1]))
+            }
+        ]
+    }));
+
+    const model: Model = {
+        optimize: "count",
+        opType: "min",
+        constraints,
+        variables,
+        ints: Object.fromEntries(
+            Object.keys(variables).map(x => [x, 1])
+        )
+    }
+
+    // Assume it's solvable. They wouldn't give us impossible input.
+    const { result } = solver.Solve(model) as Solution
+
+    return result;
+}
+
+export async function partTwo() {
+    const lines = await parseInputTwo('../inputs/10.txt');
+
+    return lines.reduce((a, x) => a + solveLPProblem(x), 0);
 }

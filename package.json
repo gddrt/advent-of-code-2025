@@ -9,5 +9,8 @@
     "typescript": "^5"
   },
   "private": true,
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "javascript-lp-solver": "^1.0.1"
+  }
 }
